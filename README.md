@@ -3,7 +3,7 @@ This is an open-source software which is called the multiphase particle in cell 
 The software is an extension of mppicFoam, and the tutorial is antisolvent crystallization which is attached together.
 
 # Copyright Information
-Copyright (C) 2019 Shinhyuk Kim, Jay H. Lee and Richard D. Braatz
+Copyright (C) 2019 Shin-Hyuk Kim, Jay H. Lee and Richard D. Braatz
 
 # License
 mppicPbeCryFoam is free sorftware.
