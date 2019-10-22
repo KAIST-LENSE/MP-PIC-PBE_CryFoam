@@ -14,4 +14,5 @@ OpenFOAM 5.x is required to compile the software.
 
 # References
 Users refer are referred to the below reference for details on the MP-PIC-PBE method.
+
 S. H. Kim, R. D. Braatz, and Jay H Lee, “Multi-Phase Particle-In-Cell Coupled with Population Balance Equation (MP-PIC-PBE) Method for Multiscale Computational Fluid Dynamics Simulation,” Comput. Chem. Eng., under review.
