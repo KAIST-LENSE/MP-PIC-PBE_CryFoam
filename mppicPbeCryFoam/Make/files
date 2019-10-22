@@ -1,0 +1,3 @@
+mppicPbeCryFoam.C
+
+EXE = $(FOAM_APPBIN)/mppicPbeCryFoam
