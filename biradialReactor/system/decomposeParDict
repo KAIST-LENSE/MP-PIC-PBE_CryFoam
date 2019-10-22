@@ -1,0 +1,112 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    note        "mesh decomposition control dictionary";
+    object      decomposeParDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+numberOfSubdomains  6;
+
+//method          scotch;
+//method          hierarchical;
+ method          simple;
+// method          metis;
+// method          manual;
+// method          multiLevel;
+// method          structured;  // does 2D decomposition of structured mesh
+/*
+multiLevelCoeffs
+{
+    // Decomposition methods to apply in turn. This is like hierarchical but
+    // fully general - every method can be used at every level.
+
+    level0
+    {
+        numberOfSubdomains  64;
+        //method simple;
+        //simpleCoeffs
+        //{
+        //    n           (2 1 1);
+        //    delta       0.001;
+        //}
+        method scotch;
+    }
+    level1
+    {
+        numberOfSubdomains  4;
+        method scotch;
+    }
+}
+*/
+// Desired output
+
+simpleCoeffs
+{
+    n           (6 1 1);
+    delta       0.001;
+}
+
+hierarchicalCoeffs
+{
+    n           (1 1 1);
+    delta       0.001;
+    order       xyz;
+}
+/*
+metisCoeffs
+{
+ 
+    processorWeights
+    (
+        1
+        1
+        1
+        1
+    );
+  
+}
+
+scotchCoeffs
+{
+    //processorWeights
+    //(
+    //    1
+    //    1
+    //    1
+    //    1
+    //);
+    //writeGraph  true;
+    //strategy "b";
+}
+*/
+manualCoeffs
+{
+    dataFile    "";
+}
+/*
+structuredCoeffs
+{
+    // Patches to do 2D decomposition on. Structured mesh only; cells have
+    // to be in 'columns' on top of patches.
+    patches     (movingWall);
+
+    // Method to use on the 2D subset
+    method      scotch;
+}
+*/
+//// Is the case distributed? Note: command-line argument -roots takes
+//// precedence
+distributed     no;
+//// Per slave (so nProcs-1 entries) the directory above the case.
+roots		();
+// ************************************************************************* //

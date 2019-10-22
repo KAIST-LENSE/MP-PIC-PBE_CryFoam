@@ -1,0 +1,140 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver          GAMG;
+        tolerance       1e-03;
+        relTol          0.05;
+        smoother        GaussSeidel;
+    }
+    pFinal
+    {
+        solver          GAMG;
+        tolerance       1e-04;
+        relTol          0;
+        smoother        GaussSeidel;
+    }
+
+    "(U|k|omega|epsilon|rho)"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    "(U|k|omega|epsilon|rho)Final"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    "(Yi|solute|solvent|antisolvent)"
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+    "(Yi|solute|solvent|antisolvent)Final"
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    "(h|e)"
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+    "(h|e)Final"
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    kinematicCloud:alpha
+    {
+        solver          GAMG;
+        tolerance       1e-6;
+        smoother        symGaussSeidel;
+    }
+
+}
+
+PIMPLE
+{
+    nOuterCorrectors 100;
+    nCorrectors     2;
+    momentumPredictor yes;
+    nNonOrthogonalCorrectors 0;
+
+    residualControl
+    {
+        p
+        {
+            relTol 0;
+            tolerance 1e-3;
+        }
+	U
+        {
+            relTol 0;
+            tolerance 1e-3;
+        }
+	"(h|e)"
+        {
+            relTol 0;
+            tolerance 5e-5;
+        }
+    }
+
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p  0.8;
+	pFinal 1;
+    }
+
+    equations
+    {
+        Yi  0.9;
+	YiFinal 1;
+
+        U  0.4;
+	UFinal 1;
+
+        "(h|e)"  0.7;
+        "(h|e)Final" 1;
+    }
+}
+
+
+// ************************************************************************* //

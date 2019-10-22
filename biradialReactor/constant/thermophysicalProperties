@@ -1,0 +1,120 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      thermophysicalProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+thermoType
+{
+    type            heRhoThermo;
+    mixture         multiComponentMixture;
+    transport       polynomial;
+    thermo          hPolynomial;
+    equationOfState icoPolynomial;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+species
+(
+    solute
+    solvent
+    antisolvent
+);
+
+solute
+{
+    specie
+    {
+        molWeight   404.256;
+    }
+    equationOfState
+    {
+        rhoCoeffs<8>    (1273.0 0 0 0 0 0 0 0);
+    }
+    thermodynamics
+    {
+        CpCoeffs<8>     (2504.22 0 0 0 0 0 0 0);
+        Hf              0;
+        Sf              0;
+    }
+    transport
+    {
+        muCoeffs<8>     (5.372e-4 0 0 0 0 0 0 0);
+        kappaCoeffs<8>  (0.203 0 0 0 0 0 0 0);
+    }
+}
+
+solvent
+{
+    specie
+    {
+        molWeight   32;
+    }
+    equationOfState
+    {
+        rhoCoeffs<8>    (782 0 0 0 0 0 0 0);
+    }
+    thermodynamics
+    {
+        CpCoeffs<8>     (2504.22 0 0 0 0 0 0 0);
+        Hf              0;
+        Sf              0;
+    }
+    transport
+    {
+        muCoeffs<8>     (5.372e-4 0 0 0 0 0 0 0);
+        kappaCoeffs<8>  (0.203 0 0 0 0 0 0 0);
+    }
+}
+
+antisolvent
+{
+    specie
+    {
+        molWeight       18.0153;
+    }
+    equationOfState
+    {
+        rhoCoeffs<8>    (997.1 0 0 0 0 0 0 0);
+    }
+    thermodynamics
+    {
+        CpCoeffs<8>     (4183.00 0 0 0 0 0 0 0);
+        Hf              0;
+        Sf              0;
+    }
+    transport
+    {
+        muCoeffs<8>     (8.95e-4 0 0 0 0 0 0 0);
+        kappaCoeffs<8>  (0.6 0 0 0 0 0 0 0);
+    }
+}
+
+
+inertSpecie     antisolvent;
+
+
+liquids
+{
+
+}
+
+solids
+{
+
+}
+
+
+// ************************************************************************* //
