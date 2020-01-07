@@ -188,7 +188,7 @@ void Foam::KinematicParcel<ParcelType>::PBE
     fj[1] = 0.0;
     forAll(sourceCrystal, i)
     {
-        fj[i+2] = F()[i] ;
+        fj[i+2] = F(i) ;
     }
     fj[noNode+2] = fj[noNode+1];
     fj[noNode+3] = fj[noNode+1];
@@ -197,20 +197,20 @@ void Foam::KinematicParcel<ParcelType>::PBE
     {
 	if(i == 0)
 	{
-            sourceCrystal[i] = dt * problem(dr, R_growthc_, R_nucleationc_, fj[i], fj[i+1], fj[i+2], fj[i+3], minmodeTheta);
+            sourceCrystal[i] = PBERHSRK(dt, dr, R_growthc_, R_nucleationc_, fj[i], fj[i+1], fj[i+2], fj[i+3], minmodeTheta);
 	}
 	else
 	{
-            sourceCrystal[i] = dt * problem(dr, R_growthc_, 0.0, fj[i], fj[i+1], fj[i+2], fj[i+3], minmodeTheta);
+            sourceCrystal[i] = PBERHSRK(dt, dr, R_growthc_, 0.0, fj[i], fj[i+1], fj[i+2], fj[i+3], minmodeTheta);
 	}
     }
 
     totalSource() = 0 ;
     forAll(sourceCrystal, i)
     {
-        F()[i] = F()[i] + sourceCrystal[i] ;
-        fw[i] = rho * kv * r4[i] * F()[i] / 4 ;
-        totalSource() += rho * kv * r4[i] / 4 * sourceCrystal[i] / stabilise(dt,SMALL) ;
+        editF(i) = F(i) + sourceCrystal[i] ;
+        fw[i] = rho * kv * r4[i] * F(i) / 4 ;
+        totalSource() += rho * kv * r4[i] / 4 * sourceCrystal[i] / dt ;
     }
     scalar total_mass(0) ;
     forAll(sourceCrystal, i)
@@ -225,16 +225,16 @@ void Foam::KinematicParcel<ParcelType>::PBE
         nt3 += fw[i] * pow(r[i+1],3) ;
         nt4 += fw[i] * pow(r[i+1],4) ;
     }
-    d() = nt4 / stabilise(nt3,SMALL) ;
+    d() = nt4 / nt3 ;
 
     const fvMesh& mesh = td.cloud().mesh() ;
     scalar total_mass_cell(total_mass * mesh.V()[celli]) ;
-    scalar noParticle(total_mass_cell / stabilise(mass(),SMALL)) ;
+    scalar noParticle(total_mass_cell / mass()) ;
 
     int roundToInt(noParticle + 0.5);
     nParticle() = max(1, roundToInt);
 
-//    Info<< "noparticle = "<< noParticle << endl;
+//    Info<< "F(1) = "<< F(1) << endl;
 //    Info<< "total_v_cell = "<< total_v_cell << endl;
 //    Info<< "volume = "<< volume() << endl;
 }
@@ -314,13 +314,17 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
     age_(p.age_),
     tTurb_(p.tTurb_),
     UTurb_(p.UTurb_),
-    F_(p.F_),
     rhoc_(p.rhoc_),
     Uc_(p.Uc_),
     muc_(p.muc_),
     R_growthc_(p.R_growthc_),
     R_nucleationc_(p.R_nucleationc_)
-{}
+{
+    for(int i=0 ; i<p.noNode() ; i++)
+    {
+        editF(i) = p.F(i) ;
+    }
+}
 
 
 template<class ParcelType>
@@ -341,13 +345,17 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
     age_(p.age_),
     tTurb_(p.tTurb_),
     UTurb_(p.UTurb_),
-    F_(p.F_),
     rhoc_(p.rhoc_),
     Uc_(p.Uc_),
     muc_(p.muc_),
     R_growthc_(p.R_growthc_),
     R_nucleationc_(p.R_nucleationc_)
-{}
+{
+    for(int i=0 ; i<p.noNode() ; i++)
+    {
+        editF(i) = p.F(i) ;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -358,7 +366,7 @@ bool Foam::KinematicParcel<ParcelType>::move
 (
     TrackData& td,
     const scalar trackTime,
-    const label withPBE
+    label withPBE
 )
 {
     typename TrackData::cloudType::parcelType& p =

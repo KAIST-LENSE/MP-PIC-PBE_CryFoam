@@ -276,9 +276,7 @@ protected:
             //- Turbulent velocity fluctuation [m/s]
             vector UTurb_;
 
-            scalarField F_;
-
-//            scalarList F_;
+            scalar F_[40];
 
             scalar kv_;
 
@@ -289,10 +287,6 @@ protected:
             scalar minmodeTheta_;
 
             scalar totalSource_ ;
-
-            scalar count_ ;
-
-
 
         // Cell-based quantities
 
@@ -496,9 +490,7 @@ public:
 
             inline scalar R_nucleationc() const;
 
-            inline const scalarField& F() const;
-
-//	    	inline const scalarList& F() const;
+            inline scalar F(int i) const;
 
             inline scalar kv() const;
 
@@ -509,8 +501,6 @@ public:
             inline scalar minmodeTheta() const;
 
             inline scalar totalSource() const;
-
-            inline scalar count() const;
 
 
         // Edit
@@ -545,9 +535,7 @@ public:
             //- Return access to turbulent velocity fluctuation
             inline vector& UTurb();
 
-            inline scalarField& F() ;
-
-//	    	inline scalarList& F();
+	    inline scalar& editF(int i);
 
             inline scalar& kv() ;
 
@@ -558,8 +546,6 @@ public:
             inline scalar& minmodeTheta() ;
 
             inline scalar& totalSource() ;
-
-            inline scalar& count() ;
 
         // Helper functions
 
@@ -672,7 +658,7 @@ public:
 
             //- Move the parcel
             template<class TrackData>
-            bool move(TrackData& td, const scalar trackTime, const label withPBE);
+            bool move(TrackData& td, const scalar trackTime, label withPBE);
 
 
         // Patch interactions

@@ -63,13 +63,11 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
     age_(0.0),
     tTurb_(0.0),
     UTurb_(Zero),
-    F_(0.0),
     kv_(0.0),
     dr_(0.0),
     noNode_(0.0),
     minmodeTheta_(0.0), 
     totalSource_(0.0),
-    count_(0.0),
     rhoc_(0.0),
     Uc_(Zero),
     muc_(0.0),
@@ -77,6 +75,10 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
     R_growthc_(0.0),
     R_nucleationc_(0.0)
 {
+    for(int i=0 ; i<noNode_ ; i++)
+    {
+        editF(i) = 0.0 ;
+    }
     if (readFields)
     {
         if (is.format() == IOstream::ASCII)
@@ -91,13 +93,15 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
             age_ = readScalar(is);
             tTurb_ = readScalar(is);
             is >> UTurb_;
-            is >> F_;
             kv_ = readScalar(is);
             dr_ = readScalar(is);
             noNode_ = readScalar(is);
+            for(int i=0 ; i<noNode_ ; i++)
+            {
+                F_[i] = readScalar(is);
+            }
             minmodeTheta_ = readScalar(is);
             totalSource_ = readScalar(is);
-            count_ = readScalar(is);
             rhoc_ = readScalar(is);
             is >> Uc_;
             muc_ = readScalar(is);
@@ -240,13 +244,6 @@ void Foam::KinematicParcel<ParcelType>::readFields(CloudType& c)
     );
     c.checkFieldIOobject(c, totalSource);
 
-    IOField<scalar> count
-    (
-        c.fieldIOobject("count", IOobject::MUST_READ),
-        valid
-    );
-    c.checkFieldIOobject(c, count);
-
     IOField<scalar> rhoc
     (
         c.fieldIOobject("rhoc", IOobject::MUST_READ),
@@ -307,13 +304,15 @@ void Foam::KinematicParcel<ParcelType>::readFields(CloudType& c)
         p.age_ = age[i];
         p.tTurb_ = tTurb[i];
         p.UTurb_ = UTurb[i];
-	p.F_ = F[i];
         p.kv_ = kv[i];
         p.dr_ = dr[i];
         p.noNode_ = noNode[i];
+        for(int j=0 ; j<p.noNode() ; j++)
+        {
+            p.F_[j] = F[i][j];
+        } 
         p.minmodeTheta_ = minmodeTheta[i];
         p.totalSource_ = totalSource[i];
-        p.count_ = count[i];
         p.rhoc_ = rhoc[i];
         p.Uc_ = Uc[i];
         p.muc_ = muc[i];
@@ -354,7 +353,6 @@ void Foam::KinematicParcel<ParcelType>::writeFields(const CloudType& c)
     IOField<scalar> noNode(c.fieldIOobject("noNode", IOobject::NO_READ), np);
     IOField<scalar> minmodeTheta(c.fieldIOobject("minmodeTheta", IOobject::NO_READ), np);
     IOField<scalar> totalSource(c.fieldIOobject("totalSource", IOobject::NO_READ), np);
-    IOField<scalar> count(c.fieldIOobject("count", IOobject::NO_READ), np);
     IOField<scalar> rhoc(c.fieldIOobject("rhoc", IOobject::NO_READ), np);
     IOField<vector> Uc(c.fieldIOobject("Uc", IOobject::NO_READ), np);
     IOField<scalar> muc(c.fieldIOobject("muc", IOobject::NO_READ), np);
@@ -367,7 +365,11 @@ void Foam::KinematicParcel<ParcelType>::writeFields(const CloudType& c)
     forAllConstIter(typename CloudType, c, iter)
     {
         const KinematicParcel<ParcelType>& p = iter();
-
+        scalarField dataF(p.noNode());
+        for(int j=0 ; j<p.noNode_ ; j++)
+        {
+            dataF[j] = p.F(j) ;
+        }
         active[i] = p.active();
         typeId[i] = p.typeId();
         nParticle[i] = p.nParticle();
@@ -378,13 +380,12 @@ void Foam::KinematicParcel<ParcelType>::writeFields(const CloudType& c)
         age[i] = p.age();
         tTurb[i] = p.tTurb();
         UTurb[i] = p.UTurb();
-        F[i] = p.F();
+        F[i] = dataF;
         kv[i] = p.kv();
         dr[i] = p.dr();
         noNode[i] = p.noNode();
         minmodeTheta[i] = p.minmodeTheta();
         totalSource[i] = p.totalSource();
-        count[i] = p.count();
         rhoc[i] = p.rhoc();
         Uc[i] = p.Uc();
         muc[i] = p.muc();
@@ -413,7 +414,6 @@ void Foam::KinematicParcel<ParcelType>::writeFields(const CloudType& c)
     noNode.write(valid);
     minmodeTheta.write(valid);
     totalSource.write(valid);
-    count.write(valid);
     rhoc.write(valid);
     Uc.write(valid);
     muc.write(valid);
@@ -445,13 +445,11 @@ Foam::Ostream& Foam::operator<<
             << token::SPACE << p.age()
             << token::SPACE << p.tTurb()
             << token::SPACE << p.UTurb()
-            << token::SPACE << p.F()
             << token::SPACE << p.kv()
             << token::SPACE << p.dr()
             << token::SPACE << p.noNode()
             << token::SPACE << p.minmodeTheta()
             << token::SPACE << p.totalSource()
-            << token::SPACE << p.count()
             << token::SPACE << p.rhoc()
             << token::SPACE << p.Uc()
             << token::SPACE << p.muc()

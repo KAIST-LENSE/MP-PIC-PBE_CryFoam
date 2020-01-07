@@ -90,20 +90,23 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
     age_(0.0),
     tTurb_(0.0),
     UTurb_(Zero),
-    F_(0.0),
     kv_(0.0),
     dr_(0.0),
     noNode_(0.0),
     minmodeTheta_(0.0), 
     totalSource_(0.0),
-    count_(0.0),
     rhoc_(0.0),
     Uc_(Zero),
     muc_(0.0),
     supersatc_(0.0),
     R_growthc_(0.0),
     R_nucleationc_(0.0)
-{}
+{
+    for(int i=0 ; i<40 ; i++)
+    {
+        editF(i) = 0 ;
+    }
+}
 
 
 template<class ParcelType>
@@ -125,20 +128,23 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
     age_(0.0),
     tTurb_(0.0),
     UTurb_(Zero),
-    F_(0.0),
-    kv_(0.0),
-    dr_(0.0),
+    kv_(0),
+    dr_(0),
     noNode_(0),
-    minmodeTheta_(0.0),
-    totalSource_(0.0),
-    count_(0.0),
+    minmodeTheta_(0),
+    totalSource_(0),
     rhoc_(0.0),
     Uc_(Zero),
     muc_(0.0),
     supersatc_(0.0),
     R_growthc_(0.0),
     R_nucleationc_(0.0)
-{}
+{
+    for(int i=0 ; i<40 ; i++)
+    {
+        editF(i) = 0 ;
+    }
+}
 
 
 template<class ParcelType>
@@ -168,13 +174,11 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
     age_(0.0),
     tTurb_(0.0),
     UTurb_(Zero),
-    F_(0.0),
-    kv_(0.0),
-    dr_(0.0),
+    kv_(0),
+    dr_(0),
     noNode_(0),
-    minmodeTheta_(0.0),
-    totalSource_(0.0),
-    count_(0.0),
+    minmodeTheta_(0),
+    totalSource_(0),
     rhoc_(0.0),
     Uc_(Zero),
     muc_(0.0),
@@ -182,6 +186,10 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
     R_growthc_(0.0),
     R_nucleationc_(0.0)
 {
+    for(int i=0 ; i<40 ; i++)
+    {
+        editF(i) = 0 ;
+    }
 }
 
 
@@ -339,9 +347,9 @@ inline Foam::scalar Foam::KinematicParcel<ParcelType>::R_nucleationc() const
 }
 
 template<class ParcelType>
-inline const Foam::scalarField& Foam::KinematicParcel<ParcelType>::F() const
+inline Foam::scalar Foam::KinematicParcel<ParcelType>::F(int i) const
 {
-    return F_;
+    return F_[i];
 }
 
 template<class ParcelType>
@@ -373,13 +381,6 @@ inline Foam::scalar Foam::KinematicParcel<ParcelType>::totalSource() const
 {
     return totalSource_;
 }
-
-template<class ParcelType>
-inline Foam::scalar Foam::KinematicParcel<ParcelType>::count() const
-{
-    return count_;
-}
-
 
 template<class ParcelType>
 inline bool& Foam::KinematicParcel<ParcelType>::active()
@@ -449,9 +450,9 @@ inline Foam::vector& Foam::KinematicParcel<ParcelType>::UTurb()
 }
 
 template<class ParcelType>
-inline Foam::scalarField& Foam::KinematicParcel<ParcelType>::F()
+inline Foam::scalar& Foam::KinematicParcel<ParcelType>::editF(int i)
 {
-    return F_;
+    return F_[i];
 }
 
 template<class ParcelType>
@@ -482,12 +483,6 @@ template<class ParcelType>
 inline Foam::scalar& Foam::KinematicParcel<ParcelType>::totalSource()
 {
     return totalSource_;
-}
-
-template<class ParcelType>
-inline Foam::scalar& Foam::KinematicParcel<ParcelType>::count()
-{
-    return count_;
 }
 
 template<class ParcelType>

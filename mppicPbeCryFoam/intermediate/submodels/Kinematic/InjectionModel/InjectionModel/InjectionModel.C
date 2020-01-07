@@ -504,11 +504,13 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
 
                     pPtr->kv() = readScalar(this->coeffDict().lookup("kv"));
                     pPtr->dr() = readScalar(this->coeffDict().lookup("dr"));
-                    pPtr->noNode() = readScalar(this->coeffDict().lookup("noNode"));
                     pPtr->minmodeTheta() = readScalar(this->coeffDict().lookup("minmodeTheta"));
-
-                    List<scalar> injectF(this->coeffDict().lookup("populationDensity"));
-                    pPtr->F() = injectF;
+                    scalarField injectF(this->coeffDict().lookup("populationDensity"));
+                    pPtr->noNode() = injectF.size();
+                    for (int i=0 ; i<pPtr->noNode() ; i++)
+                    {
+                        pPtr->editF(i) = injectF[i] ;
+                    }
 
 
                     if (pPtr->nParticle() >= 1.0)
