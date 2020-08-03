@@ -5,14 +5,13 @@ fvVectorMatrix UEqn
  ==
     cloudSU
   - R_solute*U
-  + alpha*rho*g
 );
 
 UEqn.relax();
 
 volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
-surfaceScalarField phiForces(rhorAUf*fvc::flux(cloudVolSUSu) + alphaf*rhorAUf*(g & mesh.Sf());
+surfaceScalarField phiForces(rhorAUf*fvc::flux(cloudVolSUSu) + alphaf*rhof*rhorAUf*(g & mesh.Sf()));
 
 
 if (pimple.momentumPredictor())
