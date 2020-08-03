@@ -4,8 +4,6 @@ if (!pimple.SIMPLErho())
 }
     rhof = fvc::interpolate(rho);
     const volScalarField psip0(psi*p);
-    volScalarField rAU(1.0/UEqn.A());
-    surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
     volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 
     surfaceScalarField phiHbyA
@@ -15,6 +13,7 @@ if (!pimple.SIMPLErho())
            fvc::interpolate(rho)*fvc::flux(HbyA)
          + alphaf*rhorAUf*fvc::ddtCorr(rho, U, rhophi)
         )
+        + phiForces
     );
 
     // Update the pressure BCs to ensure flux consistency
@@ -41,6 +40,11 @@ if (!pimple.SIMPLErho())
             alphaphi = alphaf*phi;
             rhophi = rhof*phi;
             alpharhophi = alphaf*rhof*phi;
+
+	    p.relax();
+
+            U = HbyA + rAU*fvc::reconstruct((phiForces + pEqn.flux()/alphaf)/rhorAUf);
+	    U.correctBoundaryConditions();
         }
     }
 
@@ -50,10 +54,6 @@ thermo.correctRho(psi*p - psip0);
 #include "rhoEqn.H"
 #include "compressibleContinuityErrs.H"
 
-p.relax();
-
-U = HbyA - rAU*fvc::grad(p);
-U.correctBoundaryConditions();
 K = 0.5*magSqr(U);
 
 
