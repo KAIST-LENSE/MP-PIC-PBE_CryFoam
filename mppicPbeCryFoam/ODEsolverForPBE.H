@@ -17,7 +17,7 @@ namespace Foam
 
         return result; 
     }
-/*
+
     double PBERHSRK(double dt, double dr, double R_growth, double R_nucleation, double fj0, double fj1, double fj2, double fj3, double minmodeTheta)
     {
  	double k1, k2, k3, k4 ;
@@ -31,6 +31,6 @@ namespace Foam
 
         return result;  
     }
-*/
+
 } // End namespace Foam
 
