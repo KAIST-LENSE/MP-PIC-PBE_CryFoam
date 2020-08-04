@@ -12,11 +12,11 @@
     (
         fvm::ddt(alpha, rho, he) + fvm::div(alpharhophi, he)
       + alpha*rho*(dHmixCell-dHmixCell.oldTime().oldTime())/runTime.deltaT()
-      + dHmixCell*fvc::ddt(alpha, rho)
+      + alpha*dHmixCell*fvc::ddt(rho)
+      + rho*dHmixCell*fvc::ddt(alpha)
       + fvc::div(alpharhophi, dHmix)
       + fvc::ddt(alpha, rho, K) + fvc::div(alpharhophi, K)
       - fvm::laplacian(alpha*turbulence->alphaEff(), he)
-//      - fvc::laplacian(alpha*turbulence->alphaEff(), dHmixCell)
       + (
             he.name() == "e"
           ? fvc::div(fvc::absolute(alphaphi, U), p, "div(phiv,p)")
@@ -35,4 +35,3 @@
     Info<< "T min/max   " << min(T).value() << ", "
         << max(T).value() << endl;
 }
-
