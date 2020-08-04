@@ -1,8 +1,6 @@
-if (!pimple.SIMPLErho())
-{
     rho = thermo.rho();
-}
     rhof = fvc::interpolate(rho);
+
     const volScalarField psip0(psi*p);
     volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 
@@ -13,8 +11,14 @@ if (!pimple.SIMPLErho())
            fvc::interpolate(rho)*fvc::flux(HbyA)
          + alphaf*rhorAUf*fvc::ddtCorr(rho, U, rhophi)
         )
-        + phiForces
     );
+
+    if (p.needReference())
+    {
+        adjustPhi(phiHbyA, U, p);
+    }
+
+    phiHbyA += phiForces;
 
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p, rho, U, phiHbyA, rhorAUf);
@@ -31,6 +35,8 @@ if (!pimple.SIMPLErho())
     while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn(pDDtEqn - fvm::laplacian(alphaf*rhorAUf, p));
+
+        pEqn.setReference(pRefCell, pRefValue);
 
         pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
 
@@ -51,13 +57,10 @@ if (!pimple.SIMPLErho())
 // Thermodynamic density update
 thermo.correctRho(psi*p - psip0);
 
-#include "rhoEqn.H"
+//#include "rhoEqn.H"
 #include "compressibleContinuityErrs.H"
 
 K = 0.5*magSqr(U);
-
-
-p.correctBoundaryConditions();
 
 if (thermo.dpdt())
 {
